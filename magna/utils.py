@@ -475,11 +475,11 @@ class MNP(Lattice):
     def make_m_field(self, m0='random'):
         t0 = time.time()
         if m0 == 'random':
-            self.m_field = df.Field(self.mesh, dim=3,
+            self.m_field = df.Field(self.mesh, nvdim=3,
                                     value=lambda point: [2 * random.random() - 1 for _ in range(3)],
                                     norm=self.ms_func)
         elif type(m0) == type((0, 0, 0)):
-            self.m_field = df.Field(self.mesh, dim=3,
+            self.m_field = df.Field(self.mesh, nvdim=3,
                                     value=m0,
                                     norm=self.ms_func)
         print('M Field made in {} s'.format(time.time()-t0))
@@ -489,49 +489,49 @@ class MNP(Lattice):
         self.arrayz = np.genfromtxt(self.mesh_csv, delimiter=',')
         t0 = time.time()
         if m0 == 'random':
-            self.m_field = df.Field(self.mesh, dim=3,
+            self.m_field = df.Field(self.mesh, nvdim=3,
                                     value=lambda point: [2 * random.random() - 1 for _ in range(3)],
                                     norm=self.alt_ms_func)
         elif type(m0) == type((0, 0, 0)):
-            self.m_field = df.Field(self.mesh, dim=3,
+            self.m_field = df.Field(self.mesh, nvdim=3,
                                     value=m0,
                                     norm=self.alt_ms_func)
         print('M Field made in {} s'.format(time.time()-t0))
 
     def make_a_field(self):
         t0 = time.time()
-        self.a_field = df.Field(self.mesh, dim=1, value=self.a_func)
+        self.a_field = df.Field(self.mesh, nvdim=1, value=self.a_func)
         print('A Field made in {} s'.format(time.time()-t0))
 
     def alt_make_a_field(self):
         t0 = time.time()
         self.n = 0
         self.arrayz = np.genfromtxt(self.mesh_csv, delimiter=',')
-        self.a_field = df.Field(self.mesh, dim=1, value=self.alt_a_func)
+        self.a_field = df.Field(self.mesh, nvdim=1, value=self.alt_a_func)
         print('A Field made in {} s'.format(time.time()-t0))
 
     def make_k_field(self):
         t0 = time.time()
-        self.k_field = df.Field(self.mesh, dim=1, value=self.k_func)
+        self.k_field = df.Field(self.mesh, nvdim=1, value=self.k_func)
         print('K Field made in {} s'.format(time.time()-t0))
 
     def alt_make_k_field(self):
         t0 = time.time()
         self.n = 0
         self.arrayz = np.genfromtxt(self.mesh_csv, delimiter=',')
-        self.k_field = df.Field(self.mesh, dim=1, value=self.alt_k_func)
+        self.k_field = df.Field(self.mesh, nvdim=1, value=self.alt_k_func)
         print('K Field made in {} s'.format(time.time()-t0))
 
     def make_u_field(self):
         t0 = time.time()
-        self.u_field = df.Field(self.mesh, dim=3, value=self.u_func)
+        self.u_field = df.Field(self.mesh, nvdim=3, value=self.u_func)
         print('U Field made in {} s'.format(time.time()-t0))
 
     def alt_make_u_field(self):
         t0 = time.time()
         self.n = 0
         self.arrayz = np.genfromtxt(self.mesh_csv, delimiter=',')        
-        self.u_field = df.Field(self.mesh, dim=3, value=self.alt_u_func)
+        self.u_field = df.Field(self.mesh, nvdim=3, value=self.alt_u_func)
         print('U Field made in {} s'.format(time.time()-t0))
 
     def initialize(self, fields='maku', autosave=True, m0='random'):
@@ -571,20 +571,20 @@ class MNP(Lattice):
         else:
             path = filepath
         if 'm' in fields:
-            self.m_field.write(os.path.join(path, 'm_field_mnp_{}.ovf'.format(self.id)))
+            self.m_field.to_file(os.path.join(path, 'm_field_mnp_{}.ovf'.format(self.id)))
         if 'a' in fields:
-            self.a_field.write(os.path.join(path, 'a_field_mnp_{}.ovf'.format(self.id)))
+            self.a_field.to_file(os.path.join(path, 'a_field_mnp_{}.ovf'.format(self.id)))
         if 'k' in fields:
-            self.k_field.write(os.path.join(path, 'k_field_mnp_{}.ovf'.format(self.id)))
+            self.k_field.to_file(os.path.join(path, 'k_field_mnp_{}.ovf'.format(self.id)))
         if 'u' in fields:
-            self.u_field.write(os.path.join(path, 'u_field_mnp_{}.ovf'.format(self.id)))
+            self.u_field.to_file(os.path.join(path, 'u_field_mnp_{}.ovf'.format(self.id)))
 
     def save_any_field(self, field, field_name, filepath='default'):
         if filepath == 'default':
             path = self.filepath
         else:
             path = filepath
-        field.write(os.path.join(path, '{}_mnp_{}.ovf'.format(field_name, self.id)))
+        field.to_file(os.path.join(path, '{}_mnp_{}.ovf'.format(field_name, self.id)))
 
     def load_fields(self, fields='maku', filepath='default'):
         if filepath == 'default':
@@ -593,7 +593,7 @@ class MNP(Lattice):
             path = filepath
         output = []
         for f in fields:
-            output.append(df.Field.fromfile(os.path.join(path, '{}_field_mnp_{}.ovf'.format(f, self.id))))
+            output.append(df.Field.from_file(os.path.join(path, r'{}_field_mnp_{}.ovf'.format(f, self.id))))
         return output
 
     def load_any_field(self, field_name, filepath='default'):
@@ -601,7 +601,7 @@ class MNP(Lattice):
             path = self.filepath
         else:
             path = filepath
-        return df.Field.fromfile(os.path.join(path, '{}_mnp_{}.ovf'.format(field_name, self.id)))
+        return df.Field.from_file(os.path.join(path, r'{}_mnp_{}.ovf'.format(field_name, self.id)))
 
     def save_all(self):
         save_mnp(self)
@@ -920,7 +920,7 @@ class MNP_Analyzer:
             mx.append(self.field.orientation.line(p1=(point), p2=(0, 0, 0), n=2).data.vx[0]),
             my.append(self.field.orientation.line(p1=(point), p2=(0, 0, 0), n=2).data.vy[0]),
             mz.append(self.field.orientation.line(p1=(point), p2=(0, 0, 0), n=2).data.vz[0])
-            angle.append(self.field.plane(z=k).angle.line(p1=point, p2=(0, 0, k), n=2).data.v[0])
+            angle.append(self.field.sel(z=k).angle(self.field.line(p1=point, p2=(0, 0, k), n=2).data.v[0]))
         table = np.column_stack((x, y, z, mx, my, mz, angle))
         table.tofile(os.path.join(self.mnp.filepath, 'centers_data.csv'), sep=',')
         print('Values extracted in {} s'.format(time.time()-t0))
